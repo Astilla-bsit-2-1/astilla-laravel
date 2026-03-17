@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Result - Guessing Game</title>
+    <title>Guessing Game | Result</title>
     <style>
         * {
             margin: 0;
@@ -140,6 +140,27 @@
             margin: 25px 0;
         }
 
+        .guessed-summary {
+            margin-top: 20px;
+            text-align: left;
+            background: linear-gradient(135deg, rgba(0, 100, 150, 0.2) 0%, rgba(0, 150, 200, 0.2) 100%);
+            border: 2px solid #00bfff;
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .guessed-summary h3 {
+            color: #9fe8ff;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .guessed-summary p {
+            color: #d8f4ff;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
         .stat-box {
             background: linear-gradient(135deg, rgba(0, 100, 150, 0.25) 0%, rgba(0, 50, 100, 0.25) 100%);
             padding: 20px;
@@ -238,11 +259,52 @@
     </style>
 </head>
 <body>
+    <style>
+        .user-nav{position:fixed;top:16px;right:20px;display:flex;align-items:center;gap:12px;z-index:999;background:rgba(0,0,0,0.4);border:1px solid rgba(100,200,255,0.25);border-radius:30px;padding:6px 18px;color:rgba(255,255,255,0.85);font-size:0.9rem;backdrop-filter:blur(8px);}
+        .user-nav a{color:#64c8ff;text-decoration:none;font-weight:600;}
+        .user-nav a:hover{text-decoration:underline;}
+        .logout-btn{background:none;border:1px solid rgba(255,120,120,0.5);border-radius:20px;padding:3px 14px;color:#ff9090;font-family:'Fredoka',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+        .logout-btn:hover{background:rgba(255,100,100,0.15);}
+    </style>
+    <nav class="user-nav">
+        @auth
+            <span>👤 {{ Auth::user()->name }}</span>
+            <form method="POST" action="{{ route('auth.logout') }}" style="display:inline;">@csrf
+                <button type="submit" class="logout-btn">Log Out</button>
+            </form>
+        @elseif(session('guest_mode'))
+            <span>🎮 Guest Mode</span>
+            <form method="POST" action="{{ route('auth.logout') }}" style="display:inline;">@csrf
+                <button type="submit" class="logout-btn">Exit</button>
+            </form>
+        @else
+            <a href="{{ route('auth.login') }}">Log In</a>
+            <a href="{{ route('auth.register') }}">Register</a>
+        @endauth
+    </nav>
     <div class="container">
+        @auth
+        @php
+            $diffColors = ['easy' => '#44dd88', 'medium' => '#ffcc00', 'hard' => '#ff6655'];
+            $diffIcons  = ['easy' => '🟢', 'medium' => '🟡', 'hard' => '🔴'];
+            $_diff = $difficulty ?? 'easy';
+        @endphp
+        <div style="text-align:center; margin-bottom: 18px;">
+            <span style="display:inline-block; padding:5px 18px; border-radius:50px; border:2px solid {{ $diffColors[$_diff] ?? '#64c8ff' }}; color:{{ $diffColors[$_diff] ?? '#64c8ff' }}; font-size:0.88em; font-weight:700; background:rgba(0,0,0,0.35); letter-spacing:0.5px;">
+                {{ $diffIcons[$_diff] ?? '🟢' }} {{ ucfirst($_diff) }} difficulty
+            </span>
+        </div>
+        @endauth
         @if ($won)
             <div class="result-icon celebration">🎉</div>
             <h1>You Won!</h1>
-            <p class="message">Excellent job! You successfully guessed the answer!</p>
+            <p class="message">
+                @if (!empty($milestone))
+                    Congratulations! You completed 5 unique correct guesses. Game complete!
+                @else
+                    Excellent job! You successfully guessed the answer!
+                @endif
+            </p>
 
             <div class="answer-reveal">
                 <p>The answer was:</p>
@@ -258,11 +320,30 @@
                     <strong>{{ $maxAttempts - $attempts }}</strong>
                     <span>Remaining</span>
                 </div>
+                @if (!empty($milestone))
+                    <div class="stat-box">
+                        <strong>{{ $uniqueScore ?? 0 }}/5</strong>
+                        <span>Unique Score</span>
+                    </div>
+                @endif
             </div>
+
+            @if (!empty($milestone) && !empty($guessedWords))
+                <div class="guessed-summary">
+                    <h3>Guessed Words Summary</h3>
+                    <p>{{ implode(', ', $guessedWords) }}</p>
+                </div>
+            @endif
         @else
-            <div class="result-icon">😢</div>
-            <h1>Game Over!</h1>
-            <p class="message">You've used all your attempts. Better luck next time!</p>
+            <div class="result-icon">@if(!empty($timerExpired ?? false))⏱@else😢@endif</div>
+            <h1>@if(!empty($timerExpired ?? false))Time's Up!@else Game Over!@endif</h1>
+            <p class="message">
+                @if(!empty($timerExpired ?? false))
+                    The timer ran out before you could guess the word. Keep practicing!
+                @else
+                    You've used all your attempts. Better luck next time!
+                @endif
+            </p>
 
             <div class="answer-reveal">
                 <p>The answer was:</p>
@@ -275,7 +356,7 @@
                     <span>Attempts Used</span>
                 </div>
                 <div class="stat-box">
-                    <strong>0</strong>
+                    <strong>{{ max(0, $maxAttempts - $attempts) }}</strong>
                     <span>Remaining</span>
                 </div>
             </div>

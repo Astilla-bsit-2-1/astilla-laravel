@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guessing Game</title>
+    <title>Guessing Game | Play</title>
     <style>
         * {
             margin: 0;
@@ -72,7 +72,7 @@
             backdrop-filter: blur(10px);
             border-radius: 40px;
             padding: 50px;
-            max-width: 600px;
+            max-width: 1100px;
             width: 100%;
             animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 4px solid #00bfff;
@@ -81,6 +81,23 @@
                 0 0 0 8px rgba(0, 150, 255, 0.15),
                 inset 0 0 20px rgba(100, 200, 255, 0.08);
             position: relative;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .game-left-column,
+        .game-right-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-right-column .button-group {
+            margin-top: 6px;
         }
 
         .container::before {
@@ -141,7 +158,7 @@
         }
 
         .hint-box::before {
-            content: '�';
+            content: '💡';
             position: absolute;
             top: -15px;
             right: 20px;
@@ -359,6 +376,7 @@
             gap: 12px;
         }
 
+
         button {
             flex: 1;
             padding: 15px;
@@ -421,6 +439,21 @@
             box-shadow: 0 8px 25px rgba(0, 191, 255, 0.35), inset 0 0 15px rgba(0, 191, 255, 0.15);
         }
 
+        .btn-exit {
+            background: linear-gradient(135deg, rgba(20, 40, 80, 0.5) 0%, rgba(10, 25, 60, 0.5) 100%);
+            color: #8ab4d4;
+            border: 3px solid rgba(100, 180, 255, 0.35);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(50, 120, 200, 0.15), inset 0 0 10px rgba(50, 120, 200, 0.08);
+        }
+
+        .btn-exit:hover {
+            background: linear-gradient(135deg, rgba(20, 60, 120, 0.5) 0%, rgba(10, 40, 90, 0.5) 100%);
+            transform: translateY(-4px) scale(1.05);
+            color: #c0d8f0;
+            box-shadow: 0 8px 25px rgba(50, 150, 255, 0.25), inset 0 0 15px rgba(50, 150, 255, 0.1);
+        }
+
         .alert {
             padding: 18px;
             margin-bottom: 25px;
@@ -460,6 +493,23 @@
             background: linear-gradient(135deg, rgba(0, 100, 150, 0.25) 0%, rgba(0, 150, 200, 0.25) 100%);
             color: #00e5ff;
             border-color: #00bfff;
+        }
+
+        .reset-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 20px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 2px solid #ffa726;
+            background: linear-gradient(135deg, rgba(255, 167, 38, 0.2) 0%, rgba(255, 193, 7, 0.2) 100%);
+            color: #ffd166;
+            font-weight: 700;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 12px rgba(255, 167, 38, 0.2), inset 0 0 8px rgba(255, 193, 7, 0.1);
+            animation: popIn 0.4s ease;
         }
 
         .progress-bar {
@@ -520,14 +570,23 @@
             }
 
             .keyboard-grid {
-                grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
-                gap: 5px;
+                gap: 6px;
+            }
+
+            .keyboard-row {
+                gap: 6px;
             }
 
             .keyboard-key {
                 padding: 8px;
                 font-size: 0.85em;
                 min-height: 38px;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .game-layout {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -576,10 +635,16 @@
         }
 
         .keyboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-            gap: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             max-width: 100%;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
         }
 
         .keyboard-key {
@@ -644,9 +709,51 @@
     </style>
 </head>
 <body>
+    <style>
+        .user-nav{position:fixed;top:16px;right:20px;display:flex;align-items:center;gap:12px;z-index:999;background:rgba(0,0,0,0.4);border:1px solid rgba(100,200,255,0.25);border-radius:30px;padding:6px 18px;color:rgba(255,255,255,0.85);font-size:0.9rem;backdrop-filter:blur(8px);}
+        .user-nav a{color:#64c8ff;text-decoration:none;font-weight:600;}
+        .user-nav a:hover{text-decoration:underline;}
+        .logout-btn{background:none;border:1px solid rgba(255,120,120,0.5);border-radius:20px;padding:3px 14px;color:#ff9090;font-family:'Fredoka',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+        .logout-btn:hover{background:rgba(255,100,100,0.15);}
+        .exit-nav-btn{background:none;border:1px solid rgba(100,180,255,0.4);border-radius:20px;padding:3px 14px;color:#8ab4d4;font-family:'Fredoka',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;text-decoration:none;}
+        .exit-nav-btn:hover{background:rgba(50,120,200,0.15);color:#c0d8f0;}
+    </style>
+    <nav class="user-nav">
+        @auth
+            <span>👤 {{ Auth::user()->name }}</span>
+            <form method="POST" action="{{ route('auth.logout') }}" style="display:inline;">@csrf
+                <button type="submit" class="logout-btn">Log Out</button>
+            </form>
+            <a href="{{ route('guessing-game.select') }}" class="exit-nav-btn">🏠 Exit to Menu</a>
+        @elseif(session('guest_mode'))
+            <span>🎮 Guest Mode</span>
+            <a href="{{ route('guessing-game.select') }}" class="exit-nav-btn">🏠 Menu</a>
+            <form method="POST" action="{{ route('auth.logout') }}" style="display:inline;">@csrf
+                <button type="submit" class="logout-btn">Exit</button>
+            </form>
+        @else
+            <a href="{{ route('auth.login') }}">Log In</a>
+            <a href="{{ route('auth.register') }}">Register</a>
+        @endauth
+    </nav>
     <div class="container">
-        <h1>🎮 Guessing Game</h1>
-
+        @auth
+        <form id="timer-expired-form" method="POST" action="{{ route('guessing-game.time-expired') }}" style="display:none;">@csrf</form>
+        @endauth
+        <h1>🎮 Guessing with Justin</h1>
+        @auth
+        @php
+            $diffColors = ['easy' => '#44dd88', 'medium' => '#ffcc00', 'hard' => '#ff6655'];
+            $diffIcons  = ['easy' => '🟢', 'medium' => '🟡', 'hard' => '🔴'];
+            $_diff = $difficulty ?? 'easy';
+        @endphp
+        <div style="text-align:center; margin: -20px 0 18px;">
+            <span style="display:inline-block; padding:4px 16px; border-radius:50px; border:2px solid {{ $diffColors[$_diff] ?? '#64c8ff' }}; color:{{ $diffColors[$_diff] ?? '#64c8ff' }}; font-size:0.88em; font-weight:700; background:rgba(0,0,0,0.35);">
+                {{ $diffIcons[$_diff] ?? '🟢' }} {{ ucfirst($_diff) }} mode
+                @if($timerSeconds ?? null) &nbsp;&bull;&nbsp; ⏱ {{ $timerSeconds }}s @endif
+            </span>
+        </div>
+        @endauth
         @if ($errors->has('error'))
             <div class="alert alert-danger">{{ $errors->first('error') }}</div>
         @endif
@@ -655,84 +762,117 @@
             <div class="alert alert-info">{{ session('info') }}</div>
         @endif
 
-        <div class="hint-box">
-            <strong>Hint:</strong>
-            <p id="current-hint">{{ $hint }}</p>
-        </div>
-
-        <div class="game-display">
-            <div class="answer-display">{{ $displayAnswer }}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: {{ (($maxAttempts - $attempts) / $maxAttempts) * 100 }}%;"></div>
-            </div>
-        </div>
-
-        <div class="stats">
-            <div class="stat-box">
-                <strong>{{ $attempts }}/{{ $maxAttempts }}</strong>
-                <span>Attempts Left</span>
-            </div>
-            <div class="stat-box">
-                <strong>{{ strlen($displayAnswer) - substr_count($displayAnswer, '_') }}/{{ strlen(str_replace(' ', '', strtoupper(substr($displayAnswer, 0, strlen($displayAnswer))))) }}</strong>
-                <span>Letters Found</span>
-            </div>
-            <div class="stat-box">
-                <strong>{{ $maxGiveUps - $giveUpUses }}/{{ $maxGiveUps }}</strong>
-                <span>Give Up Chances Left</span>
-            </div>
-        </div>
-
-        @if ($guessedLetters)
-            <div class="guesses-box">
-                <p><strong>Guessed Letters:</strong> {{ $guessedLetters }}</p>
-            </div>
+        @if (session('guessed_words_reset'))
+            <div class="reset-badge">⟲ {{ session('guessed_words_reset') }}</div>
         @endif
 
-        @if ($isWon || $isLost)
-            <div class="alert @if($isWon) alert-success @else alert-danger @endif" style="background: @if($isWon) linear-gradient(135deg, rgba(50, 150, 100, 0.3) 0%, rgba(30, 120, 80, 0.3) 100%) @else linear-gradient(135deg, rgba(200, 50, 50, 0.3) 0%, rgba(150, 30, 30, 0.3) 100%) @endif; color: @if($isWon) #66ff66 @else #ff6666 @endif; border-left: 4px solid @if($isWon) #33dd33 @else #FF4444 @endif;">
-                @if ($isWon)
-                    🎉 <strong>Congratulations!</strong> You guessed correctly!
+        <div class="game-layout">
+            <div class="game-left-column">
+                <div class="hint-box">
+                    <strong>Hint:</strong>
+                    <p id="current-hint">{{ $hint }}</p>
+                </div>
+
+                <div class="game-display">
+                    <div class="answer-display">{{ $displayAnswer }}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ (($maxAttempts - $attempts) / $maxAttempts) * 100 }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-box">
+                        <strong>{{ $maxAttempts - $attempts }}/{{ $maxAttempts }}</strong>
+                        <span>Attempts Left</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong>{{ strlen($displayAnswer) - substr_count($displayAnswer, '_') }}/{{ strlen(str_replace(' ', '', strtoupper(substr($displayAnswer, 0, strlen($displayAnswer))))) }}</strong>
+                        <span>Letters Found</span>
+                    </div>
+                    <div class="stat-box">
+                        <strong>{{ $maxGiveUps - $giveUpUses }}/{{ $maxGiveUps }}</strong>
+                        <span>Give Up Chances Left</span>
+                    </div>
+                    @auth
+                    @if(($timerSeconds ?? null) && !$isWon && !$isLost)
+                    <div class="stat-box" id="timer-stat" style="border-color:#ff9900;">
+                        <strong id="timer-display" style="color:#ff9900;">{{ $timerSeconds }}s</strong>
+                        <span style="color:#ffcc88;">⏱ Time Left</span>
+                    </div>
+                    @endif
+                    @endauth
+                </div>
+            </div>
+
+            <div class="game-right-column">
+                @if ($guessedLetters)
+                    <div class="guesses-box">
+                        <p><strong>Guessed Letters:</strong> {{ $guessedLetters }}</p>
+                    </div>
+                @endif
+
+                @if (!empty($guessedWords))
+                    <div class="guesses-box">
+                        <p><strong>Guessed Words:</strong> {{ implode(', ', $guessedWords) }}</p>
+                    </div>
+                @endif
+
+                @if ($isWon || $isLost)
+                    <div class="alert @if($isWon) alert-success @else alert-danger @endif" style="background: @if($isWon) linear-gradient(135deg, rgba(50, 150, 100, 0.3) 0%, rgba(30, 120, 80, 0.3) 100%) @else linear-gradient(135deg, rgba(200, 50, 50, 0.3) 0%, rgba(150, 30, 30, 0.3) 100%) @endif; color: @if($isWon) #66ff66 @else #ff6666 @endif; border-left: 4px solid @if($isWon) #33dd33 @else #FF4444 @endif;">
+                        @if ($isWon)
+                            🎉 <strong>Congratulations!</strong> You guessed correctly!
+                        @else
+                            😢 <strong>Game Over!</strong> You've run out of attempts.
+                        @endif
+                    </div>
+
+                    <div class="button-group">
+                        <a href="{{ route('guessing-game.reset') }}" style="text-decoration: none; flex: 1;">
+                            <button class="btn-reset" style="width: 100%;">← Select Category</button>
+                        </a>
+                    </div>
                 @else
-                    😢 <strong>Game Over!</strong> You've run out of attempts.
+                    <form action="{{ route('guessing-game.guess.post') }}" method="POST">
+                        @csrf
+
+                        <div class="button-group">
+                            <button type="submit" class="btn-guess"
+                            @if(!empty($hintRevealDisabled)) disabled title="Not available on Hard difficulty" style="opacity:0.4;cursor:not-allowed;" @endif>
+                            @if(!empty($hintRevealDisabled)) 🔒 Hint Reveal @else Guess One Letter @endif
+                        </button>
+                            <a href="{{ route('guessing-game.hint.change') }}" style="text-decoration: none; flex: 1;">
+                                <button type="button" class="btn-reset" style="width: 100%;">Give Up</button>
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="keyboard-section">
+                        <div class="keyboard-label">⌨️ Click a Letter</div>
+                        <div class="keyboard-grid" id="keyboard">
+                            @php
+                                $guessedArray = array_map('trim', array_filter(explode(',', str_replace(', ', ',', $guessedLetters))));
+                                $keyboardRows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+                            @endphp
+                            @foreach ($keyboardRows as $row)
+                                <div class="keyboard-row">
+                                    @foreach (str_split($row) as $letter)
+                                        <button 
+                                            type="button" 
+                                            class="keyboard-key @if(in_array($letter, $guessedArray)) guessed @endif" 
+                                            data-letter="{{ strtoupper($letter) }}"
+                                            @if(in_array($letter, $guessedArray)) disabled @endif
+                                            onclick="guessKeyboardLetter('{{ strtoupper($letter) }}', event)">
+                                            {{ $letter }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 @endif
             </div>
+        </div>
 
-            <div class="button-group">
-                <a href="{{ route('guessing-game.reset') }}" style="text-decoration: none; flex: 1;">
-                    <button class="btn-reset" style="width: 100%;">← Select Another Category</button>
-                </a>
-            </div>
-        @else
-            <form action="{{ route('guessing-game.guess.post') }}" method="POST">
-                @csrf
-
-                <div class="button-group">
-                    <button type="submit" class="btn-guess">Guess Letter</button>
-                    <a href="{{ route('guessing-game.hint.change') }}" style="text-decoration: none; flex: 1;">
-                        <button type="button" class="btn-reset" style="width: 100%;">Give Up</button>
-                    </a>
-                </div>
-            </form>
-
-            <div class="keyboard-section">
-                <div class="keyboard-label">⌨️ Click a Letter</div>
-                <div class="keyboard-grid" id="keyboard">
-                    @php
-                        $guessedArray = array_map('trim', array_filter(explode(',', str_replace(', ', ',', $guessedLetters))));
-                    @endphp
-                    @foreach (range('A', 'Z') as $letter)
-                        <button 
-                            type="button" 
-                            class="keyboard-key @if(in_array($letter, $guessedArray)) guessed @endif" 
-                            data-letter="{{ strtoupper($letter) }}"
-                            @if(in_array($letter, $guessedArray)) disabled @endif
-                            onclick="guessKeyboardLetter('{{ strtoupper($letter) }}', event)">
-                            {{ $letter }}
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-        @endif
     </div>
 
     <script>
@@ -807,6 +947,18 @@
         }
 
         function updateGameDisplay(data) {
+            if (data.streakCompleted) {
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
+                window.location.href = data.redirectUrl || '{{ route('guessing-game.result') }}';
+                return;
+            }
+
+            if (data.roundAdvanced) {
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
+                window.location.href = data.redirectUrl || '{{ route('guessing-game.guess') }}';
+                return;
+            }
+
             // Update answer display
             const answerDisplay = document.querySelector('.answer-display');
             if (answerDisplay) answerDisplay.textContent = data.displayAnswer;
@@ -845,6 +997,12 @@
                 attemptStats[1].querySelector('strong').textContent = data.lettersFound + '/' + totalLetters;
             }
 
+            // Update give up chances in stats and action indicator.
+            if (attemptStats[2]) {
+                const remainingHints = Math.max(0, data.maxGiveUps - data.giveUpUses);
+                attemptStats[2].querySelector('strong').textContent = remainingHints + '/' + data.maxGiveUps;
+            }
+
             // Update progress bar
             const progressFill = document.querySelector('.progress-fill');
             if (progressFill) {
@@ -854,6 +1012,7 @@
 
             // Check for win/loss
             if (data.isWon || data.isLost) {
+                if (window.gameTimerInterval) clearInterval(window.gameTimerInterval);
                 setTimeout(() => {
                     showGameResult(data);
                 }, 500);
@@ -870,6 +1029,10 @@
             if (gameForm) gameForm.style.display = 'none';
             if (keyboardSection) keyboardSection.style.display = 'none';
 
+            const guessedWordsHtml = Array.isArray(data.guessedWords) && data.guessedWords.length
+                ? `<div style="text-align: center; margin: 10px 0 20px; color: #d9e4ff; font-weight: 600;">Guessed Words: ${data.guessedWords.join(', ')}</div>`
+                : '';
+
             const resultHtml = `
                 <div class="alert ${data.isWon ? 'alert-success' : 'alert-danger'}" style="
                     background: ${data.isWon ? '#d4edda' : '#f8d7da'};
@@ -885,6 +1048,7 @@
                     <p style="color: #666; margin-bottom: 10px; font-weight: 600;">The answer was:</p>
                     <strong style="font-size: 2em; color: #667eea; display: block; font-family: 'Courier New', monospace;">${data.answer}</strong>
                 </div>
+                ${guessedWordsHtml}
                 <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px;">
                     <a href="{{ route('guessing-game.select') }}" style="
                         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -916,32 +1080,36 @@
             isSubmitting = false;
         }
 
-        // Allow submitting with Enter key
-        if (guessInput) {
-            guessInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    playKeySound();
-                    submitGuessAsync();
+        // Countdown timer for timed difficulty modes
+        @auth
+        @if(isset($timerSeconds) && $timerSeconds && !$isWon && !$isLost)
+        (function() {
+            var secs = {{ (int)$timerSeconds }};
+            var display = document.getElementById('timer-display');
+            var timerBox = document.getElementById('timer-stat');
+            var expiredForm = document.getElementById('timer-expired-form');
+            window.gameTimerInterval = setInterval(function() {
+                secs--;
+                if (display) display.textContent = secs + 's';
+                if (secs <= 10) {
+                    if (display) display.style.color = '#ff4444';
+                    if (timerBox) timerBox.style.borderColor = '#ff4444';
                 }
-            });
-
-            // Auto-submit when a letter is typed
-            guessInput.addEventListener('input', () => {
-                if (guessInput.value.length === 1) {
-                    playKeySound();
-                    setTimeout(submitGuessAsync, 200);
+                if (secs <= 0) {
+                    clearInterval(window.gameTimerInterval);
+                    if (!isSubmitting && expiredForm) expiredForm.submit();
                 }
-            });
-        }
+            }, 1000);
+        })();
+        @endif
+        @endauth
 
         // Keyboard support - press any letter key to guess
         document.addEventListener('keydown', (e) => {
             const letter = e.key.toUpperCase();
-            if (/^[A-Z]$/.test(letter) && guessInput && !isSubmitting) {
-                guessInput.value = letter;
+            if (/^[A-Z]$/.test(letter) && !isSubmitting) {
                 playKeySound();
-                setTimeout(submitGuessAsync, 100);
+                setTimeout(() => submitGuessAsync(letter), 100);
             }
         });
     </script>
